@@ -75,9 +75,11 @@ public class Explorador implements Serializable{
         Archivo a6 = new Archivo(6, "Archivo6", "Archivo6", "Lorem");
         a6.agregar();*/
         
-        Directorio d = new Directorio(25, "Directorio1", "Directorio");
+        /*Directorio d = new Directorio(25, "Directorio1", "Directorio");
         d.eliminar();
         Directorio d1 = new Directorio(25, "Directorio4", "Directorio");
-        d1.agregar();
+        d1.agregar();*/
+        
+        Interfaz i = new Interfaz();
     }  
 }
