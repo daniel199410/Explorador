@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -33,7 +32,6 @@ public class Explorador implements Serializable{
             arbol.getDocumentElement().normalize();
             currentDir = arbol.getDocumentElement();
             currentId = currentDir.getChildNodes().getLength();
-            System.out.println("Root element :" + arbol.getDocumentElement().getNodeName());
         }catch(ParserConfigurationException | SAXException | IOException e){
             XMLManager xml = new XMLManager();
             xml.crear();
@@ -66,15 +64,20 @@ public class Explorador implements Serializable{
         Archivo a3 = new Archivo(3, "Archivo3", "Archivo3", "Lorem");
         a3.agregar(); */  
         
-        for(int i = 1; i < 6; i++){
+        /*for(int i = 1; i < 6; i++){
             Archivo a = new Archivo(i, "Archivo"+i, "Archivo"+i, "Lorem");
             a.agregar();
-        }
+        }*/
         
         /*Archivo a3 = new Archivo(3, "Archivo3", "Archivo3", "Lorem");
         a3.eliminar();
         
         Archivo a6 = new Archivo(6, "Archivo6", "Archivo6", "Lorem");
         a6.agregar();*/
+        
+        Directorio d = new Directorio(25, "Directorio1", "Directorio");
+        d.eliminar();
+        Directorio d1 = new Directorio(25, "Directorio4", "Directorio");
+        d1.agregar();
     }  
 }

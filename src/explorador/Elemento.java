@@ -38,4 +38,8 @@ public class Elemento {
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
+    
+    public void agregar(){
+        
+    }
 }

@@ -1,15 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package explorador;
 
-import java.io.File;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -31,6 +21,7 @@ public class Archivo extends Elemento{
         return contenido;
     }
     
+    @Override
     public void agregar(){
         Element archivo = Explorador.arbol.createElement("archivo");
         Explorador.currentDir.appendChild(archivo);
@@ -70,6 +61,5 @@ public class Archivo extends Elemento{
         
         XMLManager xml = new XMLManager();       
         xml.guardar();
-        //Explorador.currentDir.removeChild(node);
     }
 }
