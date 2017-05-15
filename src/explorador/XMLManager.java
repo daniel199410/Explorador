@@ -37,7 +37,6 @@ public class XMLManager {
             DOMSource source = new DOMSource(doc);
             StreamResult result = new StreamResult(new File("arbol.xml"));                  
             transformer.transform(source, result);
-            System.out.println("File saved!");
             Explorador.setCurrentId(Explorador.getCurrentId() + 1);
         } catch (ParserConfigurationException | TransformerException pce) {
             System.err.print(pce.getMessage());
@@ -53,7 +52,7 @@ public class XMLManager {
             transformer.transform(source, result);
             System.out.println("File saved!");
         }catch(Exception e){
-            
+            System.err.println(e.getMessage());
         }
     }
 }		

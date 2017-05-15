@@ -2,6 +2,7 @@ package explorador;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -24,7 +25,7 @@ import org.w3c.dom.NodeList;
  */
 public class Interfaz extends JFrame implements MouseListener, ActionListener{
     private final JPanel ventana, menu, contenido;
-    private final JButton atras, abrir, crearArchivo, crearDirectorio, copiar, cortar, pegar;
+    private final JButton atras, abrir, crearArchivo, crearDirectorio, copiar, cortar, pegar, eliminar;
     private final JScrollPane jsp;
     private static JPanel ultimoClickeado;
     
@@ -44,7 +45,9 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         
         menu = new JPanel();
         menu.setMaximumSize(new Dimension(1360, 50));
+        menu.setBackground(new Color(187, 211, 249));
         contenido = new JPanel(new GridLayout(0, 10));
+        contenido.setBackground(Color.WHITE);
         jsp = new JScrollPane();
         jsp.setViewportView(contenido);
         
@@ -55,10 +58,12 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         copiar = new JButton("Copiar");        
         cortar = new JButton("Cortar");        
         pegar = new JButton("Pegar");
+        eliminar = new JButton("Eliminar");
         abrir.setEnabled(false);
         copiar.setEnabled(false);
         cortar.setEnabled(false);
-        pegar.setEnabled(Explorador.estadoPegar);       
+        pegar.setEnabled(Explorador.estadoPegar);
+        eliminar.setEnabled(false);
         atras.addActionListener(this);
         crearArchivo.addActionListener(this);
         crearDirectorio.addActionListener(this);
@@ -66,6 +71,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         abrir.addActionListener(this);
         copiar.addActionListener(this);
         cortar.addActionListener(this); 
+        eliminar.addActionListener(this);
         menu.add(atras);
         menu.add(crearArchivo);
         menu.add(crearDirectorio);
@@ -73,6 +79,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         menu.add(copiar);
         menu.add(cortar);
         menu.add(pegar);
+        menu.add(eliminar);
         
         pintar();
                
@@ -100,8 +107,8 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
     @Override
     public void mouseClicked(MouseEvent me) {
         if(ultimoClickeado != null)
-            ultimoClickeado.setBackground(Color.LIGHT_GRAY);
-        me.getComponent().setBackground(Color.yellow);
+            ultimoClickeado.setBackground(Color.WHITE);
+        me.getComponent().setBackground(new Color(187, 211, 249));
         ultimoClickeado = (JPanel) me.getComponent();
         JLabel tipoComponente = (JLabel) ultimoClickeado.getComponent(0);
         if(tipoComponente.getText().equals("directorio")) 
@@ -109,7 +116,8 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         else
             abrir.setEnabled(false);
         cortar.setEnabled(true);
-        copiar.setEnabled(true);      
+        copiar.setEnabled(true);  
+        eliminar.setEnabled(true);
     }
 
     @Override
@@ -132,7 +140,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
     public void actionPerformed(ActionEvent ae) {
         if(ae.getSource() == crearArchivo){
             String respuesta = JOptionPane.showInputDialog("Escribe el nombre del archivo");
-            if(!"".equals(respuesta)){
+            if(respuesta != null){
                 Archivo archivo = new Archivo(Explorador.getCurrentId(), respuesta, "Archivo", "Lorem");
                 archivo.agregar();
                 this.dispose();
@@ -141,7 +149,8 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         }
         if(ae.getSource() == crearDirectorio){
             String respuesta = JOptionPane.showInputDialog("Escribe el nombre del directorio");
-            if(!"".equals(respuesta)){
+            System.out.println(respuesta + "as");
+            if(respuesta != null){
                 Directorio directorio = new Directorio(Explorador.getCurrentId(), respuesta, "Directorio");
                 directorio.agregar();
                 this.dispose();              
@@ -186,8 +195,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
             Elemento removido = new Elemento(id_removido, nombreElemento.getText(), tipoElemento.getText());
             removido.eliminar();
             pegar.setEnabled(true);
-            Explorador.estadoPegar = true;
-            
+            Explorador.estadoPegar = true;           
         }
         if(ae.getSource() == pegar){
             System.out.println(Explorador.elementoaPegar);
@@ -202,6 +210,25 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
                 this.dispose();
                 new Interfaz();
             }
+        }
+        if(ae.getSource() == eliminar){
+            JLabel nombreElemento = (JLabel) ultimoClickeado.getComponent(1);
+            JLabel tipoElemento = (JLabel) ultimoClickeado.getComponent(0); 
+            if(tipoElemento.getText().equals("archivo")){
+                Element removido = Archivo.obtenerNodoHijo(nombreElemento.getText());
+                Archivo a = new Archivo(Integer.parseInt(removido.getAttribute("id")), removido.getAttribute("nombre"), removido.getNodeName(), "Lorem");
+                a.eliminar();
+            }else{
+                Element removido = Directorio.obtenerNodoHijo(nombreElemento.getText());
+                Directorio d = new Directorio(Integer.parseInt(removido.getAttribute("id")), removido.getAttribute("nombre"), removido.getNodeName());
+                d.eliminar();
+            }                
+            pegar.setEnabled(false);
+            Explorador.estadoPegar = false;
+            ultimoClickeado = null;
+            
+            this.dispose();
+            new Interfaz();
         }
     }
     
@@ -220,7 +247,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
             JLabel tipo = new JLabel(this.tipo);
             panel.add(tipo);
             panel.add(nombre);
-            panel.setBackground(Color.LIGHT_GRAY);
+            panel.setBackground(Color.WHITE);
             return panel;
         }
     }

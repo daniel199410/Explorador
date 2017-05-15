@@ -51,10 +51,8 @@ public class Elemento {
             if(nodeList.item(i).getAttributes().getNamedItem("id").getTextContent().equals(String.valueOf(this.getId()))){
                 Explorador.currentDir.removeChild(nodeList.item(i));
                 Explorador.id_soltados.add(this.getId());
-                System.out.println(this.getId());
             }     
-        }
-        
+        }        
         XMLManager xml = new XMLManager();       
         xml.guardar();
     }
