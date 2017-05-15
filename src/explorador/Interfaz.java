@@ -26,7 +26,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
     private final JPanel ventana, menu, contenido;
     private final JButton atras, abrir, crearArchivo, crearDirectorio, copiar, cortar, pegar;
     private final JScrollPane jsp;
-    private JPanel ultimoClickeado;
+    private static JPanel ultimoClickeado;
     
     public Interfaz(){
         super("Explorador de archivos");
@@ -58,7 +58,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         abrir.setEnabled(false);
         copiar.setEnabled(false);
         cortar.setEnabled(false);
-        pegar.setEnabled(false);       
+        pegar.setEnabled(Explorador.estadoPegar);       
         atras.addActionListener(this);
         crearArchivo.addActionListener(this);
         crearDirectorio.addActionListener(this);
@@ -150,7 +150,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         }
         if(ae.getSource() == abrir){
             JLabel nombreDirectorio = (JLabel) ultimoClickeado.getComponent(1);
-            Explorador.currentDir = Directorio.obtenerNodoHijo(nombreDirectorio.getText());           
+            Explorador.currentDir = Directorio.obtenerNodoHijo(nombreDirectorio.getText());
             this.dispose();               
             new Interfaz();
             Explorador.setCurrentLevel(Explorador.getCurrentLevel() + 1);
@@ -161,6 +161,46 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
                 this.dispose();
                 new Interfaz();
                 Explorador.setCurrentLevel(Explorador.getCurrentLevel() - 1);
+            }
+        }
+        if(ae.getSource() == copiar){
+            JLabel nombreElemento = (JLabel) ultimoClickeado.getComponent(1);
+            JLabel tipoElemento = (JLabel) ultimoClickeado.getComponent(0);           
+            if(tipoElemento.getText().equals("archivo")){
+                Explorador.elementoaPegar = Archivo.obtenerNodoHijo(nombreElemento.getText());
+            }
+            else
+                Explorador.elementoaPegar = Directorio.obtenerNodoHijo(nombreElemento.getText());
+            pegar.setEnabled(true);
+            Explorador.estadoPegar = true;
+        }
+        if(ae.getSource() == cortar){
+            JLabel nombreElemento = (JLabel) ultimoClickeado.getComponent(1);
+            JLabel tipoElemento = (JLabel) ultimoClickeado.getComponent(0);   
+            if(tipoElemento.getText().equals("archivo")){
+                Explorador.elementoaPegar = Archivo.obtenerNodoHijo(nombreElemento.getText());
+            }
+            else
+                Explorador.elementoaPegar = Directorio.obtenerNodoHijo(nombreElemento.getText());
+            int id_removido = Integer.parseInt(Explorador.elementoaPegar.getAttribute("id"));
+            Elemento removido = new Elemento(id_removido, nombreElemento.getText(), tipoElemento.getText());
+            removido.eliminar();
+            pegar.setEnabled(true);
+            Explorador.estadoPegar = true;
+            
+        }
+        if(ae.getSource() == pegar){
+            System.out.println(Explorador.elementoaPegar);
+            if(Explorador.elementoaPegar.getNodeName().equals("archivo")){
+                Archivo archivo = new Archivo(Explorador.getCurrentId(), Explorador.elementoaPegar.getAttribute("nombre"), "Archivo", "Lorem");
+                archivo.agregar();
+                this.dispose();
+                new Interfaz();
+            }else{
+                Directorio directorio = new Directorio(Explorador.getCurrentId(), Explorador.elementoaPegar.getAttribute("nombre"), "directorio");
+                directorio.clonar();
+                this.dispose();
+                new Interfaz();
             }
         }
     }

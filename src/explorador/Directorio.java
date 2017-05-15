@@ -2,6 +2,7 @@ package explorador;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -18,7 +19,7 @@ public class Directorio extends Elemento{
     public void agregar(){
         Element directorio = Explorador.arbol.createElement("directorio");
         Explorador.currentDir.appendChild(directorio);
-       
+
         Attr attr = Explorador.arbol.createAttribute("id");
         if(Explorador.id_soltados.isEmpty()){
             attr.setValue(String.valueOf(Explorador.getCurrentId()));
@@ -27,15 +28,15 @@ public class Directorio extends Elemento{
             attr.setValue(String.valueOf(Explorador.id_soltados.get(0)));
             Explorador.id_soltados.remove(0);
         }           
-        
+
         directorio.setAttributeNode(attr);
-        
+
         Attr attNombre = Explorador.arbol.createAttribute("nombre");
         attNombre.setValue(this.getNombre());
         directorio.setAttributeNode(attNombre);            
-               
+
         XMLManager xml = new XMLManager();
-        xml.guardar();
+        xml.guardar();        
     }
     
     public static Element obtenerNodoHijo(String nombre){
@@ -45,5 +46,11 @@ public class Directorio extends Elemento{
                 return (Element) hijos.item(i);
         }
         return null;
+    }
+    
+    public void clonar(){
+        Explorador.currentDir.appendChild(Explorador.elementoaPegar.cloneNode(true));
+        XMLManager xml = new XMLManager();
+        xml.guardar();  
     }
 }

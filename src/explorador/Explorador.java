@@ -20,7 +20,8 @@ public class Explorador implements Serializable{
     static LinkedList id_soltados = new LinkedList();
     private static int currentId = 1, currentLevel = 1;
     public static Document arbol;
-    public static Element currentDir;
+    public static Element currentDir, elementoaPegar;
+    public static boolean estadoPegar = false;
     
     public static void inicializar(){
         try{
