@@ -12,8 +12,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
@@ -22,7 +24,7 @@ import org.w3c.dom.NodeList;
  */
 public class Interfaz extends JFrame implements MouseListener, ActionListener{
     private final JPanel ventana, menu, contenido;
-    private final JButton atras, abrir, crear, copiar, cortar, pegar;
+    private final JButton atras, abrir, crearArchivo, crearDirectorio, copiar, cortar, pegar;
     private final JScrollPane jsp;
     private JPanel ultimoClickeado;
     
@@ -47,35 +49,37 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         jsp.setViewportView(contenido);
         
         atras = new JButton("Atrás");
-        crear = new JButton("Crear");      
+        crearArchivo = new JButton("Crear archivo");      
+        crearDirectorio = new JButton("Crear directorio");
         abrir = new JButton("Abrir");        
         copiar = new JButton("Copiar");        
         cortar = new JButton("Cortar");        
         pegar = new JButton("Pegar");
-        atras.setEnabled(false);
         abrir.setEnabled(false);
         copiar.setEnabled(false);
         cortar.setEnabled(false);
         pegar.setEnabled(false);       
         atras.addActionListener(this);
-        crear.addActionListener(this);
+        crearArchivo.addActionListener(this);
+        crearDirectorio.addActionListener(this);
         pegar.addActionListener(this);
         abrir.addActionListener(this);
         copiar.addActionListener(this);
         cortar.addActionListener(this); 
         menu.add(atras);
-        menu.add(crear);
+        menu.add(crearArchivo);
+        menu.add(crearDirectorio);
         menu.add(abrir);
         menu.add(copiar);
         menu.add(cortar);
         menu.add(pegar);
+        
+        pintar();
                
         ventana.add(menu);
         ventana.add(jsp);
         
-        this.add(ventana);
-        
-        pintar();
+        this.add(ventana);       
         
         this.setResizable(false);
         this.setBackground(Color.LIGHT_GRAY);
@@ -88,7 +92,6 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         for(int i = 0; i < listaNodos.getLength(); i++){
             Panel panel = new Panel(listaNodos.item(i).getNodeName(), listaNodos.item(i).getAttributes().getNamedItem("nombre").getTextContent());
             JPanel elemento = panel.crear();
-            //lista_paneles.add(elemento);
             elemento.addMouseListener(this);
             contenido.add(elemento);
         }
@@ -99,11 +102,14 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         if(ultimoClickeado != null)
             ultimoClickeado.setBackground(Color.LIGHT_GRAY);
         me.getComponent().setBackground(Color.yellow);
-        abrir.setEnabled(true);
-        cortar.setEnabled(true);
-        copiar.setEnabled(true);
         ultimoClickeado = (JPanel) me.getComponent();
-        this.setTitle("Hola");
+        JLabel tipoComponente = (JLabel) ultimoClickeado.getComponent(0);
+        if(tipoComponente.getText().equals("directorio")) 
+            abrir.setEnabled(true);
+        else
+            abrir.setEnabled(false);
+        cortar.setEnabled(true);
+        copiar.setEnabled(true);      
     }
 
     @Override
@@ -124,6 +130,39 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent ae) {
+        if(ae.getSource() == crearArchivo){
+            String respuesta = JOptionPane.showInputDialog("Escribe el nombre del archivo");
+            if(!"".equals(respuesta)){
+                Archivo archivo = new Archivo(Explorador.getCurrentId(), respuesta, "Archivo", "Lorem");
+                archivo.agregar();
+                this.dispose();
+                new Interfaz();
+            }
+        }
+        if(ae.getSource() == crearDirectorio){
+            String respuesta = JOptionPane.showInputDialog("Escribe el nombre del directorio");
+            if(!"".equals(respuesta)){
+                Directorio directorio = new Directorio(Explorador.getCurrentId(), respuesta, "Directorio");
+                directorio.agregar();
+                this.dispose();              
+                new Interfaz();
+            }
+        }
+        if(ae.getSource() == abrir){
+            JLabel nombreDirectorio = (JLabel) ultimoClickeado.getComponent(1);
+            Explorador.currentDir = Directorio.obtenerNodoHijo(nombreDirectorio.getText());           
+            this.dispose();               
+            new Interfaz();
+            Explorador.setCurrentLevel(Explorador.getCurrentLevel() + 1);
+        }
+        if(ae.getSource() == atras){
+            if(Explorador.getCurrentLevel() > 1){
+                Explorador.currentDir = (Element) Explorador.currentDir.getParentNode();
+                this.dispose();
+                new Interfaz();
+                Explorador.setCurrentLevel(Explorador.getCurrentLevel() - 1);
+            }
+        }
     }
     
     class Panel{

@@ -38,17 +38,12 @@ public class Directorio extends Elemento{
         xml.guardar();
     }
     
-    public void eliminar(){
-    NodeList nodeList = Explorador.currentDir.getChildNodes();
-        for(int i = 0; i < nodeList.getLength(); i++){
-            if(nodeList.item(i).getAttributes().getNamedItem("id").getTextContent().equals(String.valueOf(this.getId()))){
-                Explorador.currentDir.removeChild(nodeList.item(i));
-                Explorador.id_soltados.add(this.getId());
-                System.out.println(this.getId());
-            }     
+    public static Element obtenerNodoHijo(String nombre){
+        NodeList hijos = Explorador.currentDir.getChildNodes();
+        for(int i = 0; i < hijos.getLength(); i++){
+            if(hijos.item(i).getNodeName().equals("directorio") && hijos.item(i).getAttributes().getNamedItem("nombre").getTextContent().equals(nombre))               
+                return (Element) hijos.item(i);
         }
-        
-        XMLManager xml = new XMLManager();       
-        xml.guardar();
+        return null;
     }
 }

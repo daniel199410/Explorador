@@ -18,7 +18,7 @@ import org.xml.sax.SAXException;
 public class Explorador implements Serializable{
     
     static LinkedList id_soltados = new LinkedList();
-    private static int currentId = 1;
+    private static int currentId = 1, currentLevel = 1;
     public static Document arbol;
     public static Element currentDir;
     
@@ -49,6 +49,14 @@ public class Explorador implements Serializable{
     public static void setCurrentId(int aCurrentId) {
         currentId = aCurrentId;
     } 
+
+    public static int getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public static void setCurrentLevel(int aCurrentLevel) {
+        currentLevel = aCurrentLevel;
+    }
     
     public void agregarDirectorio(){
         
@@ -64,9 +72,11 @@ public class Explorador implements Serializable{
         Archivo a3 = new Archivo(3, "Archivo3", "Archivo3", "Lorem");
         a3.agregar(); */  
         
-        /*for(int i = 1; i < 6; i++){
-            Archivo a = new Archivo(i, "Archivo"+i, "Archivo"+i, "Lorem");
+        /*for(int i = 10; i < 30; i++){
+            Archivo a = new Archivo(i, "Archivo"+i, "Archivo", "Lorem");
             a.agregar();
+            Directorio d = new Directorio(i, "Directorio"+i, "Archivo");
+            d.agregar();
         }*/
         
         /*Archivo a3 = new Archivo(3, "Archivo3", "Archivo3", "Lorem");

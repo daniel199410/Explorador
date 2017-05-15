@@ -1,5 +1,7 @@
 package explorador;
 
+import org.w3c.dom.NodeList;
+
 /**
  *
  * @author Daniel
@@ -41,5 +43,19 @@ public class Elemento {
     
     public void agregar(){
         
+    }
+    
+    public void eliminar(){
+        NodeList nodeList = Explorador.currentDir.getChildNodes();
+        for(int i = 0; i < nodeList.getLength(); i++){
+            if(nodeList.item(i).getAttributes().getNamedItem("id").getTextContent().equals(String.valueOf(this.getId()))){
+                Explorador.currentDir.removeChild(nodeList.item(i));
+                Explorador.id_soltados.add(this.getId());
+                System.out.println(this.getId());
+            }     
+        }
+        
+        XMLManager xml = new XMLManager();       
+        xml.guardar();
     }
 }
