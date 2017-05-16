@@ -2,7 +2,6 @@ package explorador;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -25,7 +24,7 @@ import org.w3c.dom.NodeList;
  */
 public class Interfaz extends JFrame implements MouseListener, ActionListener{
     private final JPanel ventana, menu, contenido;
-    private final JButton atras, abrir, crearArchivo, crearDirectorio, copiar, cortar, pegar, eliminar;
+    private final JButton atras, abrir, crearArchivo, crearDirectorio, copiar, cortar, pegar, eliminar, cerrarSesion;
     private final JScrollPane jsp;
     private static JPanel ultimoClickeado;
     
@@ -59,6 +58,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         cortar = new JButton("Cortar");        
         pegar = new JButton("Pegar");
         eliminar = new JButton("Eliminar");
+        cerrarSesion = new JButton("Cerrar sesión");
         abrir.setEnabled(false);
         copiar.setEnabled(false);
         cortar.setEnabled(false);
@@ -72,6 +72,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         copiar.addActionListener(this);
         cortar.addActionListener(this); 
         eliminar.addActionListener(this);
+        cerrarSesion.addActionListener(this);
         menu.add(atras);
         menu.add(crearArchivo);
         menu.add(crearDirectorio);
@@ -80,6 +81,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         menu.add(cortar);
         menu.add(pegar);
         menu.add(eliminar);
+        menu.add(cerrarSesion);
         
         pintar();
                
@@ -149,7 +151,6 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         }
         if(ae.getSource() == crearDirectorio){
             String respuesta = JOptionPane.showInputDialog("Escribe el nombre del directorio");
-            System.out.println(respuesta + "as");
             if(respuesta != null){
                 Directorio directorio = new Directorio(Explorador.getCurrentId(), respuesta, "Directorio");
                 directorio.agregar();
@@ -229,6 +230,11 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
             
             this.dispose();
             new Interfaz();
+        }
+        if(ae.getSource() == cerrarSesion){
+            Usuario.cerrarSesion();
+            this.dispose();
+            new InterfazInicio();
         }
     }
     

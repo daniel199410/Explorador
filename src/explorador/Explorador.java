@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,8 +21,8 @@ public class Explorador implements Serializable{
     
     static LinkedList id_soltados = new LinkedList();
     private static int currentId = 1, currentLevel = 1;
-    public static Document arbol;
-    public static Element currentDir, elementoaPegar;
+    public static Document arbol, arbolUsuarios;
+    public static Element currentDir, elementoaPegar, currentUser, usersContainer;
     public static boolean estadoPegar = false;
     
     public static void inicializar(){
@@ -36,6 +38,18 @@ public class Explorador implements Serializable{
         }catch(ParserConfigurationException | SAXException | IOException e){
             XMLManager xml = new XMLManager();
             xml.crear();
+        }
+        try{
+            File xmlFile = new File("usuarios.xml");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xmlFile);
+            arbolUsuarios = doc;
+            arbolUsuarios.getDocumentElement().normalize();
+            usersContainer = arbolUsuarios.getDocumentElement();
+        }catch(ParserConfigurationException | SAXException | IOException e){
+            XMLManager xml = new XMLManager();
+            xml.crearTablaUsuario();
         }
     }
 
@@ -91,6 +105,9 @@ public class Explorador implements Serializable{
         Directorio d1 = new Directorio(25, "Directorio4", "Directorio");
         d1.agregar();*/
         
-        Interfaz i = new Interfaz();
+        //Interfaz i = new Interfaz();
+        //InterfazInicio i = new InterfazInicio();
+        //InterfazRegistro i = new InterfazRegistro();
+        InterfazInicio i = new InterfazInicio();
     }  
 }

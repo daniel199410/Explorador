@@ -1,5 +1,7 @@
 package explorador;
 
+import static explorador.Explorador.arbolUsuarios;
+import static explorador.Explorador.usersContainer;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,16 +45,55 @@ public class XMLManager {
         }
     }
     
+    public void crearTablaUsuario(){
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            // root element
+            Document doc = docBuilder.newDocument();
+            doc.setXmlVersion("1.0");
+            doc.setXmlStandalone(false);
+            Element rootElement = doc.createElement("usuarios");
+            doc.appendChild(rootElement);
+            
+            // write the content into xml file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File("usuarios.xml"));                  
+            transformer.transform(source, result);
+            Explorador.setCurrentId(Explorador.getCurrentId() + 1);
+            arbolUsuarios = doc;
+            arbolUsuarios.getDocumentElement().normalize();
+            usersContainer = arbolUsuarios.getDocumentElement();
+        } catch (ParserConfigurationException | TransformerException pce) {
+            System.err.print(pce.getMessage());
+        }
+    }
+    
     public void guardar(){
         try{
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(Explorador.arbol);
             StreamResult result = new StreamResult(new File("arbol.xml"));                  
-            transformer.transform(source, result);
-            System.out.println("File saved!");
+            transformer.transform(source, result);          
         }catch(Exception e){
             System.err.println(e.getMessage());
         }
     }
-}		
+    
+    public void guardarUsuario(){
+        try{
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(Explorador.arbolUsuarios);
+            StreamResult result = new StreamResult(new File("usuarios.xml"));                  
+            transformer.transform(source, result);           
+        }catch(Exception e){
+            System.err.println(e.getMessage());
+        }
+    }
+}
+
+
