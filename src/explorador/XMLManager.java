@@ -1,6 +1,8 @@
 package explorador;
 
+import static explorador.Explorador.arbol;
 import static explorador.Explorador.arbolUsuarios;
+import static explorador.Explorador.currentDir;
 import static explorador.Explorador.usersContainer;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
@@ -40,6 +42,10 @@ public class XMLManager {
             StreamResult result = new StreamResult(new File("arbol.xml"));                  
             transformer.transform(source, result);
             Explorador.setCurrentId(Explorador.getCurrentId() + 1);
+            arbol = doc;
+            arbol.getDocumentElement().normalize();
+            currentDir = arbol.getDocumentElement();
+            Explorador.setCurrentId(currentDir.getChildNodes().getLength());
         } catch (ParserConfigurationException | TransformerException pce) {
             System.err.print(pce.getMessage());
         }

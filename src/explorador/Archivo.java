@@ -1,5 +1,6 @@
 package explorador;
 
+import javax.swing.JLabel;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -10,11 +11,15 @@ import org.w3c.dom.NodeList;
  */
 public class Archivo extends Elemento{
     
-    private String contenido;
+    private String contenido, dueño;
+    private boolean lectura, edicion;
     
-    public Archivo(int id, String nombre, String tipo, String contenido) {
+    public Archivo(int id, String nombre, String tipo, String contenido, boolean lectura, boolean edicion, String dueño) {
         super(id, nombre, tipo);
         this.contenido = contenido;
+        this.lectura = lectura;
+        this.edicion = edicion;
+        this.dueño = dueño;
     }   
 
     public String getContenido() {
@@ -34,12 +39,23 @@ public class Archivo extends Elemento{
             attr.setValue(String.valueOf(Explorador.id_soltados.get(0)));
             Explorador.id_soltados.remove(0);
         }           
-
         archivo.setAttributeNode(attr);     
 
         Attr attNombre = Explorador.arbol.createAttribute("nombre");
         attNombre.setValue(this.getNombre());
         archivo.setAttributeNode(attNombre);
+        
+        Attr attDueño = Explorador.arbol.createAttribute("dueño");
+        attDueño.setValue(this.getDueño());
+        archivo.setAttributeNode(attDueño);
+        
+        Attr attLectura = Explorador.arbol.createAttribute("lectura");
+        attLectura.setValue(lectura ? "Público" : "Privado");
+        archivo.setAttributeNode(attLectura); 
+        
+        Attr attEscritura = Explorador.arbol.createAttribute("escritura");
+        attEscritura.setValue(edicion ? "Público" : "Privado");
+        archivo.setAttributeNode(attEscritura); 
 
         Attr attContenido = Explorador.arbol.createAttribute("contenido");
         attContenido.setValue(this.getContenido());
@@ -49,6 +65,23 @@ public class Archivo extends Elemento{
         xml.guardar();       
     }
     
+    public void editar(){                 
+        JLabel nombreElemento = (JLabel) Interfaz.ultimoClickeado.getComponent(1);
+        Element elemento = (Element) obtenerNodoHijo(nombreElemento.getText()).cloneNode(true);
+        Elemento viejo = new Elemento(Integer.parseInt(elemento.getAttribute("id")), elemento.getAttribute("nombre"), "Directorio");
+        viejo.eliminar();
+        
+        elemento.setAttribute("id", String.valueOf(this.getId()));
+        elemento.setAttribute("nombre", this.getNombre());
+        elemento.setAttribute("dueño", this.getDueño());
+        elemento.setAttribute("lectura", lectura ? "Público" : "Privado");
+        elemento.setAttribute("escritura", edicion ? "Público" : "Privado");       
+        
+        Explorador.currentDir.appendChild(elemento);
+        XMLManager xml = new XMLManager();
+        xml.guardar();
+    }
+    
     public static Element obtenerNodoHijo(String nombre){
         NodeList hijos = Explorador.currentDir.getChildNodes();
         for(int i = 0; i < hijos.getLength(); i++){
@@ -56,5 +89,17 @@ public class Archivo extends Elemento{
                 return (Element) hijos.item(i);
         }
         return null;
+    }
+
+    public boolean isLectura() {
+        return lectura;
+    }
+
+    public boolean isEdicion() {
+        return edicion;
+    }
+
+    public String getDueño() {
+        return dueño;
     }
 }

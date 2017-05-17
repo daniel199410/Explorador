@@ -24,9 +24,9 @@ import org.w3c.dom.NodeList;
  */
 public class Interfaz extends JFrame implements MouseListener, ActionListener{
     private final JPanel ventana, menu, contenido;
-    private final JButton atras, abrir, crearArchivo, crearDirectorio, copiar, cortar, pegar, eliminar, cerrarSesion;
+    private final JButton atras, abrir, crearArchivo, crearDirectorio, copiar, cortar, pegar, eliminar, editar, cerrarSesion;
     private final JScrollPane jsp;
-    private static JPanel ultimoClickeado;
+    public static JPanel ultimoClickeado;
     
     public Interfaz(){
         super("Explorador de archivos");
@@ -58,12 +58,14 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         cortar = new JButton("Cortar");        
         pegar = new JButton("Pegar");
         eliminar = new JButton("Eliminar");
+        editar = new JButton("Editar");
         cerrarSesion = new JButton("Cerrar sesión");
         abrir.setEnabled(false);
         copiar.setEnabled(false);
         cortar.setEnabled(false);
         pegar.setEnabled(Explorador.estadoPegar);
         eliminar.setEnabled(false);
+        editar.setEnabled(false);
         atras.addActionListener(this);
         crearArchivo.addActionListener(this);
         crearDirectorio.addActionListener(this);
@@ -72,6 +74,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         copiar.addActionListener(this);
         cortar.addActionListener(this); 
         eliminar.addActionListener(this);
+        editar.addActionListener(this);
         cerrarSesion.addActionListener(this);
         menu.add(atras);
         menu.add(crearArchivo);
@@ -81,6 +84,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         menu.add(cortar);
         menu.add(pegar);
         menu.add(eliminar);
+        menu.add(editar);
         menu.add(cerrarSesion);
         
         pintar();
@@ -120,6 +124,7 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         cortar.setEnabled(true);
         copiar.setEnabled(true);  
         eliminar.setEnabled(true);
+        editar.setEnabled(true);
     }
 
     @Override
@@ -141,29 +146,24 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
     @Override
     public void actionPerformed(ActionEvent ae) {
         if(ae.getSource() == crearArchivo){
-            String respuesta = JOptionPane.showInputDialog("Escribe el nombre del archivo");
-            if(respuesta != null){
-                Archivo archivo = new Archivo(Explorador.getCurrentId(), respuesta, "Archivo", "Lorem");
-                archivo.agregar();
-                this.dispose();
-                new Interfaz();
-            }
+            new InterfazCrearElemento("Archivo");  
+            this.dispose();
         }
-        if(ae.getSource() == crearDirectorio){
-            String respuesta = JOptionPane.showInputDialog("Escribe el nombre del directorio");
-            if(respuesta != null){
-                Directorio directorio = new Directorio(Explorador.getCurrentId(), respuesta, "Directorio");
-                directorio.agregar();
-                this.dispose();              
-                new Interfaz();
-            }
+        if(ae.getSource() == crearDirectorio){       
+            new InterfazCrearElemento("Directorio");  
+            this.dispose();
         }
         if(ae.getSource() == abrir){
             JLabel nombreDirectorio = (JLabel) ultimoClickeado.getComponent(1);
-            Explorador.currentDir = Directorio.obtenerNodoHijo(nombreDirectorio.getText());
-            this.dispose();               
-            new Interfaz();
-            Explorador.setCurrentLevel(Explorador.getCurrentLevel() + 1);
+            Element ultimo = Directorio.obtenerNodoHijo(nombreDirectorio.getText());
+            if(ultimo.getAttribute("lectura").equals("Público") || ultimo.getAttribute("dueño").equals(Explorador.currentUser.getAttribute("nombre"))){
+                Explorador.currentDir = Directorio.obtenerNodoHijo(nombreDirectorio.getText());
+                this.dispose();               
+                new Interfaz();
+                Explorador.setCurrentLevel(Explorador.getCurrentLevel() + 1);
+            }else{
+                JOptionPane.showMessageDialog(null, "No tienes permisos de lectura de este fichero", "Error de acceso", JOptionPane.ERROR_MESSAGE);
+            }        
         }
         if(ae.getSource() == atras){
             if(Explorador.getCurrentLevel() > 1){
@@ -176,37 +176,43 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         if(ae.getSource() == copiar){
             JLabel nombreElemento = (JLabel) ultimoClickeado.getComponent(1);
             JLabel tipoElemento = (JLabel) ultimoClickeado.getComponent(0);           
-            if(tipoElemento.getText().equals("archivo")){
+            if(tipoElemento.getText().equals("archivo"))
                 Explorador.elementoaPegar = Archivo.obtenerNodoHijo(nombreElemento.getText());
-            }
             else
                 Explorador.elementoaPegar = Directorio.obtenerNodoHijo(nombreElemento.getText());
-            pegar.setEnabled(true);
-            Explorador.estadoPegar = true;
+            if(Explorador.elementoaPegar.getAttribute("escritura").equals("Público") || Explorador.elementoaPegar.getAttribute("dueño").equals(Explorador.currentUser.getAttribute("nombre"))){
+                pegar.setEnabled(true);
+                Explorador.estadoPegar = true;
+            }else{
+                JOptionPane.showMessageDialog(null, "No tienes permisos para copiar este elemento", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+            }
         }
         if(ae.getSource() == cortar){
             JLabel nombreElemento = (JLabel) ultimoClickeado.getComponent(1);
-            JLabel tipoElemento = (JLabel) ultimoClickeado.getComponent(0);   
-            if(tipoElemento.getText().equals("archivo")){
+            JLabel tipoElemento = (JLabel) ultimoClickeado.getComponent(0);
+            if(tipoElemento.getText().equals("archivo"))
                 Explorador.elementoaPegar = Archivo.obtenerNodoHijo(nombreElemento.getText());
-            }
             else
                 Explorador.elementoaPegar = Directorio.obtenerNodoHijo(nombreElemento.getText());
-            int id_removido = Integer.parseInt(Explorador.elementoaPegar.getAttribute("id"));
-            Elemento removido = new Elemento(id_removido, nombreElemento.getText(), tipoElemento.getText());
-            removido.eliminar();
-            pegar.setEnabled(true);
-            Explorador.estadoPegar = true;           
+            if(Explorador.elementoaPegar.getAttribute("escritura").equals("Público") || Explorador.elementoaPegar.getAttribute("dueño").equals(Explorador.currentUser.getAttribute("nombre"))){
+                int id_removido = Integer.parseInt(Explorador.elementoaPegar.getAttribute("id"));
+                Elemento removido = new Elemento(id_removido, nombreElemento.getText(), tipoElemento.getText());
+                removido.eliminar();
+                pegar.setEnabled(true);
+                Explorador.estadoPegar = true;   
+            }else{
+                JOptionPane.showMessageDialog(null, "No tienes permisos para cortar este elemento", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+            }      
         }
         if(ae.getSource() == pegar){
             System.out.println(Explorador.elementoaPegar);
             if(Explorador.elementoaPegar.getNodeName().equals("archivo")){
-                Archivo archivo = new Archivo(Explorador.getCurrentId(), Explorador.elementoaPegar.getAttribute("nombre"), "Archivo", "Lorem");
+                Archivo archivo = new Archivo(Explorador.getCurrentId(), Explorador.elementoaPegar.getAttribute("nombre"), "Archivo", "Lorem", true, true, "adm");
                 archivo.agregar();
                 this.dispose();
                 new Interfaz();
             }else{
-                Directorio directorio = new Directorio(Explorador.getCurrentId(), Explorador.elementoaPegar.getAttribute("nombre"), "directorio");
+                Directorio directorio = new Directorio(Explorador.getCurrentId(), Explorador.elementoaPegar.getAttribute("nombre"), "directorio", true, true, "Adm");
                 directorio.clonar();
                 this.dispose();
                 new Interfaz();
@@ -214,22 +220,50 @@ public class Interfaz extends JFrame implements MouseListener, ActionListener{
         }
         if(ae.getSource() == eliminar){
             JLabel nombreElemento = (JLabel) ultimoClickeado.getComponent(1);
-            JLabel tipoElemento = (JLabel) ultimoClickeado.getComponent(0); 
+            JLabel tipoElemento = (JLabel) ultimoClickeado.getComponent(0);
             if(tipoElemento.getText().equals("archivo")){
                 Element removido = Archivo.obtenerNodoHijo(nombreElemento.getText());
-                Archivo a = new Archivo(Integer.parseInt(removido.getAttribute("id")), removido.getAttribute("nombre"), removido.getNodeName(), "Lorem");
-                a.eliminar();
+                if(removido.getAttribute("escritura").equals("Público") || removido.getAttribute("dueño").equals(Explorador.currentUser.getAttribute("nombre"))){
+                    Archivo a = new Archivo(Integer.parseInt(removido.getAttribute("id")), removido.getAttribute("nombre"), removido.getNodeName(), "Lorem", true, true, "adm");
+                    a.eliminar();
+                    pegar.setEnabled(false);
+                    Explorador.estadoPegar = false;
+                    ultimoClickeado = null;            
+                    this.dispose();
+                    new Interfaz();
+                }else{
+                    JOptionPane.showMessageDialog(null, "No tienes permisos para cortar este elemento", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+                }
             }else{
                 Element removido = Directorio.obtenerNodoHijo(nombreElemento.getText());
-                Directorio d = new Directorio(Integer.parseInt(removido.getAttribute("id")), removido.getAttribute("nombre"), removido.getNodeName());
-                d.eliminar();
-            }                
-            pegar.setEnabled(false);
-            Explorador.estadoPegar = false;
-            ultimoClickeado = null;
-            
-            this.dispose();
-            new Interfaz();
+                if(removido.getAttribute("escritura").equals("Público") || removido.getAttribute("dueño").equals(Explorador.currentUser.getAttribute("nombre"))){  
+                    Directorio d = new Directorio(Integer.parseInt(removido.getAttribute("id")), removido.getAttribute("nombre"), removido.getNodeName(), true, true, "admn");
+                    d.eliminar();
+                    pegar.setEnabled(false);
+                    Explorador.estadoPegar = false;
+                    ultimoClickeado = null;            
+                    this.dispose();
+                    new Interfaz();
+                }else{
+                    JOptionPane.showMessageDialog(null, "No tienes permisos para cortar este elemento", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+        if(ae.getSource() == editar){                         
+            JLabel nombreDirectorio = (JLabel) ultimoClickeado.getComponent(1);
+            JLabel tipoElemento = (JLabel) ultimoClickeado.getComponent(0);
+            Element ultimo;
+            if(tipoElemento.getText().equals("directorio")){
+                ultimo = Directorio.obtenerNodoHijo(nombreDirectorio.getText());
+            }else{
+                ultimo = Archivo.obtenerNodoHijo(nombreDirectorio.getText());
+            }
+            if(ultimo.getAttribute("escritura").equals("Público") || ultimo.getAttribute("dueño").equals(Explorador.currentUser.getAttribute("nombre"))){                    
+                this.dispose();
+                new InterfazEditarElemento(tipoElemento.getText());
+            }else{
+            JOptionPane.showMessageDialog(null, "No tienes permisos para cortar este elemento", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+            }
         }
         if(ae.getSource() == cerrarSesion){
             Usuario.cerrarSesion();

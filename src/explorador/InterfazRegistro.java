@@ -21,9 +21,9 @@ import javax.swing.JTextField;
  */
 public class InterfazRegistro extends JFrame implements ActionListener{
     
-    private JPanel ventana, campoNombre, campoPass, divisor;
+    private JPanel ventana, campoNombre, campoPass, campoBotones, divisor;
     private JLabel header, nombre, pass;
-    private JButton registrar;
+    private JButton registrar, cancelar;
     private JTextField tnombre;
     private JPasswordField Ppass;
     
@@ -60,14 +60,21 @@ public class InterfazRegistro extends JFrame implements ActionListener{
         divisor = new JPanel();
         divisor.setMaximumSize(new Dimension(x, 20));
         
+        campoBotones = new JPanel();
+        campoBotones.setMaximumSize(new Dimension(x * 8 / 10, 20));
+        campoBotones.setLayout(new GridLayout(1, 2));
         registrar = new JButton("Registrar");
         registrar.addActionListener(this);
+        cancelar = new JButton("Cancelar");
+        cancelar.addActionListener(this);
+        campoBotones.add(registrar);
+        campoBotones.add(cancelar);
         
         ventana.add(header);
         ventana.add(campoNombre);
         ventana.add(campoPass);  
         ventana.add(divisor);
-        ventana.add(registrar);
+        ventana.add(campoBotones);
         
         this.add(ventana);       
         this.setResizable(false);
@@ -101,6 +108,10 @@ public class InterfazRegistro extends JFrame implements ActionListener{
             }else{
                 JOptionPane.showMessageDialog(null, "Ingresa un nombre y una contraseña", "Datos incompletos", JOptionPane.ERROR_MESSAGE);
             }
+        }
+        if(ae.getSource() == cancelar){
+            this.dispose();
+            new InterfazInicio();
         }
     }
 }

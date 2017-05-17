@@ -11,7 +11,7 @@ import org.w3c.dom.NodeList;
 public class Usuario extends Elemento{
 
     private String pass;
-    private static int currentId = 1;
+    private static int currentId = Explorador.usersContainer.getChildNodes().getLength();
     
     public Usuario(int id, String nombre, String tipo, String pass) {
         super(id, nombre, tipo);
@@ -31,7 +31,7 @@ public class Usuario extends Elemento{
     }
      
     @Override
-    public void agregar(){
+    public void agregar(){       
         Element usuario = Explorador.arbolUsuarios.createElement("usuario");
         Explorador.usersContainer.appendChild(usuario);
 
@@ -87,5 +87,7 @@ public class Usuario extends Elemento{
     
     public static void cerrarSesion(){
         Explorador.currentUser = null;
+        Explorador.elementoaPegar = null;
+        Explorador.estadoPegar = false;
     }
 }

@@ -47,10 +47,12 @@ public class Elemento {
     
     public void eliminar(){
         NodeList nodeList = Explorador.currentDir.getChildNodes();
+        boolean eliminado = false;
         for(int i = 0; i < nodeList.getLength(); i++){
-            if(nodeList.item(i).getAttributes().getNamedItem("id").getTextContent().equals(String.valueOf(this.getId()))){
+            if(nodeList.item(i).getAttributes().getNamedItem("id").getTextContent().equals(String.valueOf(this.getId())) && !eliminado){
                 Explorador.currentDir.removeChild(nodeList.item(i));
                 Explorador.id_soltados.add(this.getId());
+                eliminado = true;
             }     
         }        
         XMLManager xml = new XMLManager();       

@@ -78,20 +78,16 @@ public class Explorador implements Serializable{
     }
 
     public static void main(String[] args) {
-        inicializar();
-        /*Archivo a = new Archivo(1, "Archivo1", "Archivo1", "Lorem");
-        a.agregar();
-        Archivo a2 = new Archivo(2, "Archivo2", "Archivo2", "Lorem");
-        a2.agregar();
-        a.eliminar();
-        Archivo a3 = new Archivo(3, "Archivo3", "Archivo3", "Lorem");
-        a3.agregar(); */  
+        inicializar();      
         
-        /*for(int i = 10; i < 30; i++){
-            Archivo a = new Archivo(i, "Archivo"+i, "Archivo", "Lorem");
+        /*String[] nombres = {"Daniel", "Daniela"};
+        for(int i = 0; i < 60; i++){
+            Archivo a = new Archivo(i, "Archivo"+i, "Archivo", "Lorem", Math.random() < 0.5, Math.random() < 0.5, nombres[Math.round((float) Math.random())]);
             a.agregar();
-            Directorio d = new Directorio(i, "Directorio"+i, "Archivo");
-            d.agregar();
+        }      
+        for(int i = 60; i < 100; i++){
+            Directorio a = new Directorio(i, "Directorio"+i, "Directorio", Math.random() < 0.5, Math.random() < 0.5, nombres[Math.round((float) Math.random())]);
+            a.agregar();
         }*/
         
         /*Archivo a3 = new Archivo(3, "Archivo3", "Archivo3", "Lorem");
@@ -108,6 +104,9 @@ public class Explorador implements Serializable{
         //Interfaz i = new Interfaz();
         //InterfazInicio i = new InterfazInicio();
         //InterfazRegistro i = new InterfazRegistro();
+        //InterfazCrearElemento i = new InterfazCrearElemento();
+        
+        
         InterfazInicio i = new InterfazInicio();
     }  
 }
